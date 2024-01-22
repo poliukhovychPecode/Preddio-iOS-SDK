@@ -7,7 +7,7 @@ enum Environment {
     case production
 }
 
-struct AWSConfig {
+public struct AWSConfig {
     var awsRegion: AWSRegionType
     var ioTEndpoint: String
     var identityPoolID: String

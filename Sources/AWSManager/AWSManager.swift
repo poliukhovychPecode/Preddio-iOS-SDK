@@ -3,7 +3,7 @@ import AWSIoT
 import AWSCognitoIdentityProvider
 import AWSCore
 
-protocol AWSManagerDelegate: AnyObject {
+public protocol AWSManagerDelegate: AnyObject {
     func attachPolicy(with siteID: String, cognitoId: String, withConnect: Bool)
 }
 
@@ -11,8 +11,8 @@ final public class AWSManager {
     
     static public let shared = AWSManager()
     
-    @Published var registered: Bool = false
-    var clientId: String = ""
+    @Published public var registered: Bool = false
+    public var clientId: String = ""
     
     private var iotDataManager: AWSIoTDataManager!
     private var iotManager: AWSIoTManager!
@@ -24,12 +24,12 @@ final public class AWSManager {
     private static var configSetter: AWSConfig?
     private let config: AWSConfig
     
-    internal var siteId: String?
+    public var siteId: String?
     
-    weak var delegate: AWSManagerDelegate?
+    public weak var delegate: AWSManagerDelegate?
     
     // MARK: call before .shared
-    class func setup(_ config: AWSConfig){
+    public class func setup(_ config: AWSConfig){
         AWSManager.configSetter = config
     }
     
@@ -40,7 +40,7 @@ final public class AWSManager {
         self.config = config
     }
         
-    internal func registerManager() {
+    public func registerManager() {
         var serviceConfiguration = AWSServiceConfiguration(
             region: config.awsRegion,
             credentialsProvider: nil
@@ -72,7 +72,7 @@ final public class AWSManager {
         AWSServiceManager.default().defaultServiceConfiguration = serviceConfiguration
     }
     
-    func getAWSClientID(siteId: String, withConnect: Bool = false) {
+    public func getAWSClientID(siteId: String, withConnect: Bool = false) {
         getAWSClientID(credentials: credentialsProvider) { [weak self] clientId, error in
             guard let self = self,
                   let clientId = clientId, !clientId.isEmpty else {
@@ -132,7 +132,7 @@ final public class AWSManager {
         })
     }
     
-    func setClientId(id: String, withConnect: Bool) {
+    public func setClientId(id: String, withConnect: Bool) {
         clientId = id
         initializeDataPlane(credentialsProvider: self.credentialsProvider)
         if withConnect {
@@ -174,7 +174,7 @@ extension AWSManager {
     }
     
     // TODO: set siteId
-    func handleConnectViaWebsocket() {
+    public func handleConnectViaWebsocket() {
         guard !clientId.isEmpty else {
             // MARK: Use in project before handleConnectViaWebsocket
             getAWSClientID(siteId: siteId ?? "", withConnect: true)
@@ -190,7 +190,7 @@ extension AWSManager {
         })
     }
     
-    func disconnect(reconnect: Bool = false) {
+    public func disconnect(reconnect: Bool = false) {
         needToReconnect = reconnect
         if !reconnect {
             updateTimer?.invalidate()
@@ -205,7 +205,7 @@ extension AWSManager {
         }
     }
     
-    func publish(to topic: String, payloads: [String: Any]) {
+    public func publish(to topic: String, payloads: [String: Any]) {
         print("AWS Publish payloads: \(payloads)")
         
         do {
@@ -225,13 +225,13 @@ extension AWSManager {
     }
     
     
-    func unsubscribe(from topic: String) {
+    public func unsubscribe(from topic: String) {
         iotDataManager.unsubscribeTopic(topic)
     }
     
-    func subscribe(with topic: String,
-                   serialNumberCompletion: ((Bool?) -> Void)?,
-                   messageCompletion: (([String : Any]) -> Void)?) {
+    public func subscribe(with topic: String,
+                          serialNumberCompletion: ((Bool?) -> Void)?,
+                          messageCompletion: (([String : Any]) -> Void)?) {
         func messageReceived(payload: Data) {
             let payloadDictionary = jsonDataToDict(jsonData: payload)
             print("AWS Message received in topic \(topic): \(payloadDictionary)")
