@@ -17,7 +17,8 @@ let package = Package(
         .target(
             name: "AWSManager",
             dependencies: [.product(name: "AWSIoT", package: "aws-sdk-ios-spm"),
-                           .product(name: "AWSCognitoIdentityProvider", package: "aws-sdk-ios-spm")],
+                           .product(name: "AWSCognitoIdentityProvider", package: "aws-sdk-ios-spm"),
+                           .product(name: "AWSSNS", package: "aws-sdk-ios-spm")],
             path: "Sources"
         )
     ]
