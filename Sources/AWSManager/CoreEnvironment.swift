@@ -1,5 +1,5 @@
 import Foundation
-import AWSIoT
+//import AWSIoT
 
 enum Environment {
     case test
@@ -8,7 +8,7 @@ enum Environment {
 }
 
 public struct AWSConfig {
-    var awsRegion: AWSRegionType
+//    var awsRegion: AWSRegionType
     var ioTEndpoint: String
     var identityPoolID: String
     var awsIoTDataManagerKey: String
