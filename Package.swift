@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Preddio-iOS-SDK",
+    defaultLocalization: "en",
     platforms: [.iOS(.v13), .macOS(.v12)],
     products: [
         .library(name: "AWSManager",
@@ -20,6 +21,7 @@ let package = Package(
             dependencies: []
         ),
         .target(name: "BluetoothManager",
-               dependencies: [])
+                dependencies: [],
+                resources: [.process("Resources")])
     ]
 )

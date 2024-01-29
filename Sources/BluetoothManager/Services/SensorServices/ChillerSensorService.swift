@@ -26,7 +26,7 @@ final public class ChillerSensorService {
     
     public func fetchCharacteristics(_ serviceCharacteristics: [CBCharacteristic]) {
         for characteristic in serviceCharacteristics {
-            print("Characteristic Chiller: " + characteristic.uuid.uuidString)
+            debugLog("Characteristic Chiller: " + characteristic.uuid.uuidString)
             
             switch characteristic.uuid.uuidString {
             case lowAlarmUUID:
@@ -47,7 +47,7 @@ final public class ChillerSensorService {
             return
         }
         
-        print("Characteristic Chiller Low Alarm: \(characteristic)")
+        debugLog("Characteristic Chiller Low Alarm: \(characteristic)")
         let data: Data = Data(bytes: &value, count: MemoryLayout.size(ofValue: value))
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
@@ -57,7 +57,7 @@ final public class ChillerSensorService {
             return
         }
         
-        print("Characteristic Chiller High Alarm: \(characteristic)")
+        debugLog("Characteristic Chiller High Alarm: \(characteristic)")
         let data: Data = Data(bytes: &value, count: MemoryLayout.size(ofValue: value))
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
@@ -67,7 +67,7 @@ final public class ChillerSensorService {
             return
         }
         
-        print("Characteristic Chiller Duration: \(characteristic)")
+        debugLog("Characteristic Chiller Duration: \(characteristic)")
         var timestamp = UInt16(duration)
         let data: Data = Data(bytes: &timestamp,
                               count: MemoryLayout.size(ofValue: timestamp))

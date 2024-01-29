@@ -54,23 +54,22 @@ public enum SensorType: String {
             
             switch SensorType(rawValue: hexs[2]) {
                 
-//            case .Purge : return PurgeSensor(peripheral: peripheral,
-//                                             rssi: rssi,
-//                                             hexs: hexs,
-//                                             sensorType: .Purge,
-//                                             type: .purge,
-//                                             dataBytes: dataBytes)
+            case .Purge : return PurgeSensor(peripheral: peripheral,
+                                             rssi: rssi,
+                                             hexs: hexs,
+                                             sensorType: .Purge,
+                                             type: .purge,
+                                             dataBytes: dataBytes)
             case .Chill: return ChillerSensor(peripheral: peripheral,
                                               rssi: rssi,
                                               hexs: hexs,
                                               sensorType: .Chill,
                                               type: .incoming)
-//            case .DO: return DOSensor(peripheral: peripheral,
-//                                            rssi: rssi,
-//                                            hexs: hexs,
-//                                            sensorType: .DO,
-//                                            type: .doType,
-//                                            dataBytes: dataBytes)
+            case .DO: return DOSensor(peripheral: peripheral,
+                                      rssi: rssi,
+                                      hexs: hexs,
+                                      sensorType: .DO,
+                                      dataBytes: dataBytes)
             default : return nil
             }
         }

@@ -1,0 +1,17 @@
+
+"kSecond" = "second";
+"kSeconds" = "seconds";
+"kHours" = "hours";
+"kHour" = "hour";
+"kMinutes" = "minutes";
+"kMinute" = "minute";
+"kDay" = "day";
+"kDays" = "days";
+"kWeek" = "week";
+"kWeeks" = "weeks";
+"kMonth" = "month";
+"kMonths" = "months";
+"kYear" = "year";
+"kYears" = "years";
+
+"kFormatDateAgo" = "Last calibrated: %d %@ ago";

@@ -1,7 +1,7 @@
 import Foundation
 import CoreBluetooth
 
-public enum ChillerBluetoothState {
+public enum FermenterBluetoothState {
     case stop
     case connecting
     case connected
@@ -17,11 +17,11 @@ public enum ChillerBluetoothState {
     case readyToStart
 }
 
-public final class ChillerBluetoothManager: BaseBluetoothManager {
+public final class FermenterBluetoothManager: BaseBluetoothManager {
     
     //MARK: Properties
-    @Published public var state: ChillerBluetoothState = .stop
-    internal var sensorService: ChillerSensorService?
+    @Published public var state: FermenterBluetoothState = .stop
+    internal var sensorService: FermenterSensorService?
     
     //MARK: Methods
     
@@ -58,17 +58,12 @@ public final class ChillerBluetoothManager: BaseBluetoothManager {
     
     //MARK: Characteristic set
     
-    public func setAlarmCharacteristic(_ peripheral: CBPeripheral?,
-                                       low: Int, high: Int, duration: Int) {
+    public func setStartCharacteristic(_ peripheral: CBPeripheral?, position: Int) {
         guard let peripheral = peripheral else {
             return
         }
-        var low = low
-        var high = high
         state = .startUpdateCharacteristic
-        sensorService?.writeChillerLowAlarmCharacteristic(value: &low, in: peripheral)
-        sensorService?.writeChillerHighAlarmCharacteristic(value: &high, in: peripheral)
-        sensorService?.writeChillerDurationCharacteristic(duration: duration, in: peripheral)
+        sensorService?.writeReversePurgeStartCharacteristic(in: peripheral)
     }
     
     private func setPeripheralDelegate(_ peripheral: CBPeripheral, start: Bool) {
@@ -83,9 +78,16 @@ public final class ChillerBluetoothManager: BaseBluetoothManager {
         peripheral.discoverServices(list)
     }
     
+    public func fetchPurgeOxygen(_ peripheral: CBPeripheral?) {
+        guard let peripheral = self.peripheral else {
+            return
+        }
+        sensorService?.readOxygenCharacteristic(in: peripheral)
+    }
+    
 }
 
-extension ChillerBluetoothManager: CBCentralManagerDelegate {
+extension FermenterBluetoothManager: CBCentralManagerDelegate {
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             if central.isScanning {
@@ -146,9 +148,22 @@ extension ChillerBluetoothManager: CBCentralManagerDelegate {
         })
     }
     
+    private func readOxygenValue(_ characteristic: CBCharacteristic) {
+        guard let data = characteristic.value else {
+            return
+        }
+        let bytesArray = data.map { String(format: "%02X", $0) }
+        
+        if bytesArray[0] == "FF" && bytesArray[1] == "FF" {
+            return
+        } else {
+            state = .readyToStart
+        }
+    }
+    
 }
 
-extension ChillerBluetoothManager: CBPeripheralDelegate {
+extension FermenterBluetoothManager: CBPeripheralDelegate {
     
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         if fromStart {
@@ -163,10 +178,10 @@ extension ChillerBluetoothManager: CBPeripheralDelegate {
         }
         for service in peripheralServices {
             print("Service: \(service.uuid)")
-            if let sensorService = sensorService, !sensorService.hasCharacteristics {
+            if let fermenterService = sensorService, !fermenterService.hasCharacteristics {
                 peripheral.discoverCharacteristics(nil, for: service)
             } else {
-                sensorService = ChillerSensorService()
+                sensorService = FermenterSensorService()
                 peripheral.discoverCharacteristics(nil, for: service)
             }
             state = .connected
@@ -203,11 +218,21 @@ extension ChillerBluetoothManager: CBPeripheralDelegate {
             state = .failed
         } else {
             print("Characteristic didWriteValueFor: \(characteristic)")
-            sensorService?.characteristicUpdatedCount += 1
-            if sensorService?.characteristicUpdatedCount == 3 {
-                state = .characteristicUpdated
+            state = .characteristicUpdated
+        }
+    }
+    
+    public func peripheral(_ peripheral: CBPeripheral,
+                    didUpdateValueFor characteristic: CBCharacteristic,
+                    error: Error?) {
+        if fromStart {
+            guard self.peripheral == peripheral else {
+                state = state != .connecting ? .connected : .connecting
+                return
             }
         }
+        print("Characteristic didUpdateValueFor: \(characteristic)")
+        readOxygenValue(characteristic)
     }
     
 }

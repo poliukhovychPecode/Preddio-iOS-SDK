@@ -15,6 +15,14 @@ public enum TemperatureSensorType: Int, EquipmentSensorType, Equatable {
     }
 }
 
+public enum DOSensorType: Int, EquipmentSensorType {
+    case doType = 1
+    
+    public var activityString: String {
+        return "DO_SESSION"
+    }
+}
+
 public protocol SensorBaseProtocol {
     var mfgId: String { get }
     var productType: String { get }
