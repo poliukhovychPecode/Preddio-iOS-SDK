@@ -33,10 +33,14 @@ public final class ChillerBluetoothManager: BaseBluetoothManager {
         peripheralManager?.stopAdvertising()
     }
     
-    public override func startScanning() {
-        super.startScanning()
+    public func startScanning() {
+        startScanning(base: false)
         sensorsData.removeAll()
         sensorData = nil
+    }
+    
+    public func stopScanning() {
+        stopScanning(reset: false)
     }
     
     public override func restartStanning() {
@@ -85,8 +89,8 @@ public final class ChillerBluetoothManager: BaseBluetoothManager {
     
 }
 
-extension ChillerBluetoothManager: CBCentralManagerDelegate {
-    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+extension ChillerBluetoothManager {
+    public override func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             if central.isScanning {
                 central.stopScan()
@@ -97,7 +101,7 @@ extension ChillerBluetoothManager: CBCentralManagerDelegate {
         }
     }
     
-    public func centralManager(_ central: CBCentralManager,
+    public override func centralManager(_ central: CBCentralManager,
                                didDiscover peripheral: CBPeripheral,
                                advertisementData: [String: Any],
                                rssi RSSI: NSNumber) {

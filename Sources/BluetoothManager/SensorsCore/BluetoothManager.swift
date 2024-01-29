@@ -15,7 +15,7 @@ public protocol BluetoothManagerProtocol {
     func bluetoothError(_ state: CBManagerState)
     func startAdvertising()
     func stopAdvertising()
-    func startScanning()
+    func startScanning(base: Bool)
     func restartStanning()
     func stopScanning(reset: Bool)
     func connect(peripheral: CBPeripheral, fromStart: Bool)

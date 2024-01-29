@@ -39,10 +39,14 @@ public final class StopBluetoothManager: BaseBluetoothManager {
         peripheralManager?.stopAdvertising()
     }
     
-    public override func startScanning() {
-        super.startScanning()
+    public func startScanning() {
+        super.startScanning(base: false)
         sensorsData.removeAll()
         sensorData = nil
+    }
+    
+    public func stopScanning() {
+        stopScanning(reset: false)
     }
     
     public override func restartStanning() {
@@ -95,31 +99,7 @@ public final class StopBluetoothManager: BaseBluetoothManager {
     
 }
 
-extension StopBluetoothManager: CBCentralManagerDelegate {
-    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn {
-            if central.isScanning {
-                central.stopScan()
-            }
-            central.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : true])
-        } else {
-            bluetoothError(central.state)
-        }
-    }
-    
-    public func centralManager(_ central: CBCentralManager,
-                               didDiscover peripheral: CBPeripheral,
-                               advertisementData: [String: Any],
-                               rssi RSSI: NSNumber) {
-        
-        let adData = AdvertisementData(advertisementData: advertisementData)
-        if let manufacturerData = adData.manufacturerData {
-            setSensorData(peripheral: peripheral,
-                          rssi: RSSI,
-                          data: manufacturerData,
-                          dict: advertisementData)
-        }
-    }
+extension StopBluetoothManager {
     
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("********************  Connected \(peripheral.identifier)")

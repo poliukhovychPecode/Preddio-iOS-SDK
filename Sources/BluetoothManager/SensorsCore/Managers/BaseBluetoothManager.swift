@@ -19,18 +19,26 @@ open class BaseBluetoothManager: NSObject, BluetoothManagerProtocol {
     public func startAdvertising() { }
     public func stopAdvertising() { }
     
-    public func startScanning() {
-        print("startScanning **********************")
+    public func startScanning(base: Bool) {
+        print("startScanning \(Self.description()) **********************")
         resetServices()
         restartStanning()
+        
+        guard base else {
+            return
+        }
+        
+        if centralManager?.isScanning != true {
+            centralManager = CBCentralManager(delegate: self, queue: nil)
+        }
     }
     
     public func restartStanning() {
-        print("restartStanning **********************")
+        print("restartStanning \(Self.description()) **********************")
     }
     
     public func stopScanning(reset: Bool = false) {
-        print("stopScanning **********************")
+        print("stopScanning \(Self.description()) **********************")
         centralManager?.stopScan()
         
         guard reset else {
@@ -106,6 +114,33 @@ extension BaseBluetoothManager: CBPeripheralManagerDelegate {
             }
         } else {
             bluetoothError(peripheral.state)
+        }
+    }
+}
+
+extension BaseBluetoothManager: CBCentralManagerDelegate {
+    public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        if central.state == .poweredOn {
+            if central.isScanning {
+                central.stopScan()
+            }
+            central.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey : true])
+        } else {
+            bluetoothError(central.state)
+        }
+    }
+    
+    public func centralManager(_ central: CBCentralManager,
+                               didDiscover peripheral: CBPeripheral,
+                               advertisementData: [String: Any],
+                               rssi RSSI: NSNumber) {
+        
+        let adData = AdvertisementData(advertisementData: advertisementData)
+        if let manufacturerData = adData.manufacturerData {
+            setSensorData(peripheral: peripheral,
+                          rssi: RSSI,
+                          data: manufacturerData,
+                          dict: advertisementData)
         }
     }
 }
