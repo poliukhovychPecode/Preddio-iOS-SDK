@@ -14,11 +14,16 @@ let package = Package(
                  targets: ["BluetoothManager"])
     ],
     dependencies: [
+        .package(url: "https://github.com/aws-amplify/amplify-swift", from: "2.0.0")
     ],
     targets: [
         .target(
             name: "AWSManager",
-            dependencies: []
+            dependencies: [
+                .product(name: "Amplify", package: "amplify-swift"),
+                .product(name: "AWSPluginsCore", package: "amplify-swift"),
+                .product(name: "AWSCognitoAuthPlugin", package: "amplify-swift")
+            ]
         ),
         .target(name: "BluetoothManager",
                 dependencies: [],
